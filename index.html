@@ -1,0 +1,422 @@
+<!doctype html>
+<html>
+<head>
+    <title>Feinstaub PJ</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.1.0/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.1.0/dist/leaflet-src.js"></script>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="https://d3js.org/d3-hexbin.v0.2.min.js"></script>
+    <script src="js/leaflet-realtime.js"></script>
+    <script src="js/leaflet-hash.js"></script>
+    <script src="data/positions2.js"></script>
+    <link rel="stylesheet" href="css/style.css" />
+    <script src="hexbin.js"></script>
+
+    
+</head>
+<body>
+<div id="map"></div>
+
+<script src="map.js"></script>
+
+<div id='control'>    
+<div id='boutons'>
+<button class="selec" id="PM10" value="PM10" onclick="reloadStyle(this.value)">Standorte PM10</button>
+<button class="selec" id="PM2.5" value="PM2.5" onclick="reloadStyle(this.value)">Standorte PM2.5</button>
+</div>
+ <div id='boutons2'>
+<button class="selec2" id="hmPM10" value="hmPM10" onclick="reloadStyle(this.value)">Heatmap PM10</button>
+<button class="selec2" id="hmPM2.5" value="hmPM2.5" onclick="reloadStyle(this.value)"> Heatmap PM2.5</button>
+</div>   
+    
+<div id='boutons3'>
+<button class="selec3" id="temp" value="temp" onclick="reloadStyle(this.value)">Standorte Temp.</button> 
+<button class="selec3" id="humi" value="humi" onclick="reloadStyle(this.value)">Standorte Feucht.</button>
+</div>     
+    
+<div id='boutons4'>
+<button class="selec4" id="hmtemp" value="hmtemp" onclick="reloadStyle(this.value)">Heatmap Temp.</button> 
+<button class="selec4" id="hmhumi" value="hmhumi" onclick="reloadStyle(this.value)">Heatmap Feucht.</button>
+</div>    
+    
+    
+<div id='mean'>Mittelwert angezeigter Sensoren:
+    <div id='meanwert'></div> 
+</div>   
+            
+<select name="position" size="1" onchange="centerMap(this.value)">
+<option value="" disabled selected>W&auml;hlen Sie einen Ort!</option>
+<option value="europe">Europe</option>
+<option value="deutschland">Deutschland</option>
+<option value="germany">Germany</option>
+<option value="badenwuerttemberg">Baden-Wu&uuml;ttemberg</option>
+<option value="bayern">Bayern</option>
+<option value="brandenburg">Brandenburg</option>
+<option value="hessen">Hessen</option>
+<option value="mecklenburgvorpommern">Mecklenburg-Vorpommern</option>
+<option value="niedersachsen">Niedersachsen</option>
+<option value="nordrheinwestfalen">Nordrheinwestfalen</option>
+<option value="rheinlandpfalz">rheinlandpfalz</option>
+<option value="saarland">Saarland</option>
+<option value="sachsen">Sachsen</option>
+<option value="sachsenanhalt">Sachsenanhalt</option>
+<option value="schleswigholstein">Schleswig-Holstein</option>
+<option value="thueringen">Th&uuml;ringen</option>
+<option value="ruhrgebiet">Ruhrgebiet</option>
+<option value="aachen">Aachen</option>
+<option value="aalen">Aalen</option>
+<option value="ahlen">Ahlen</option>
+<option value="arnsberg">Arnsberg</option>
+<option value="aschaffenburg">Aschaffenburg</option>
+<option value="augsburg">Augsburg</option>
+<option value="badhomburg">Badhomburg</option>
+<option value="badkreuznach">Badkreuznach</option>
+<option value="badoeynhausen">Badoeynhausen</option>
+<option value="badsalzuflen">Badsalzuflen</option>
+<option value="badenbaden">Badenbaden</option>
+<option value="bamberg">Bamberg</option>
+<option value="bayreuth">Bayreuth</option>
+<option value="bergheim">Bergheim</option>
+<option value="bergischgladbach">Bergischgladbach</option>
+<option value="berlin">Berlin</option>
+<option value="bielefeld">Bielefeld</option>
+<option value="bocholt">Bocholt</option>
+<option value="bochum">Bochum</option>
+<option value="boeblingen">B&ouml;blingen</option>
+<option value="boeblingen">B&ouml;blingen</option>
+<option value="bonn">Bonn</option>
+<option value="bottrop">Bottrop</option>
+<option value="brandenburganderhavel">Brandenburganderhavel</option>
+<option value="braunschweig">Braunschweig</option>
+<option value="bremen">Bremen</option>
+<option value="bremerhaven">Bremerhaven</option>
+<option value="castroprauxel">Castroprauxel</option>
+<option value="celle">Celle</option>
+<option value="chemnitz">Chemnitz</option>
+<option value="cottbus">Cottbus</option>
+<option value="cuxhaven">Cuxhaven</option>
+<option value="darmstadt">Darmstadt</option>
+<option value="delmenhorst">Delmenhorst</option>
+<option value="dessaurosslau">Dessaurosslau</option>
+<option value="detmold">Detmold</option>
+<option value="dinslaken">Dinslaken</option>
+<option value="dormagen">Dormagen</option>
+<option value="dorsten">Dorsten</option>
+<option value="dortmund">Dortmund</option>
+<option value="dresden">Dresden</option>
+<option value="dueren">D&uuml;ren</option>
+<option value="duesseldorf">D&uuml;sseldorf</option>
+<option value="duisburg">Duisburg</option>
+<option value="elmshorn">Elmshorn</option>
+<option value="emden">Emden</option>
+<option value="erftstadt">Erftstadt</option>
+<option value="erfurt">Erfurt</option>
+<option value="erlangen">Erlangen</option>
+<option value="eschweiler">Eschweiler</option>
+<option value="essen">Essen</option>
+<option value="esslingen">Esslingen</option>
+<option value="euskirchen">Euskirchen</option>
+<option value="flensburg">Flensburg</option>
+<option value="frankenthal">Frankenthal</option>
+<option value="frankfurt">Frankfurt</option>
+<option value="frankfurtoder">Frankfurtoder</option>
+<option value="frechen">Frechen</option>
+<option value="freiburg">Freiburg</option>
+<option value="friedrichshafen">Friedrichshafen</option>
+<option value="fuerth">F&uuml;rth</option>
+<option value="fulda">Fulda</option>
+<option value="garbsen">Garbsen</option>
+<option value="gelsenkirchen">Gelsenkirchen</option>
+<option value="gera">Gera</option>
+<option value="giessen">Giessen</option>
+<option value="gladbeck">Gladbeck</option>
+<option value="goeppingen">G&ouml;ppingen</option>
+<option value="goerlitz">G&ouml;rlitz</option>
+<option value="goettingen">G&ouml;ttingen</option>
+<option value="goslar">Goslar</option>
+<option value="greifswald">Greifswald</option>
+<option value="greiz">Greiz</option>
+<option value="grevenbroich">Grevenbroich</option>
+<option value="guetersloh">G&uuml;tersloh</option>
+<option value="gummersbach">Gummersbach</option>
+<option value="hagen">Hagen</option>
+<option value="halle">Halle</option>
+<option value="hamburg">Hamburg</option>
+<option value="hameln">Hameln</option>
+<option value="hamm">Hamm</option>
+<option value="hanau">Hanau</option>
+<option value="hannover">Hannover</option>
+<option value="hattingen">Hattingen</option>
+<option value="heidelberg">Heidelberg</option>
+<option value="heidenheim">Heidenheim</option>
+<option value="heilbronn">Heilbronn</option>
+<option value="herford">Herford</option>
+<option value="herne">Herne</option>
+<option value="herten">Herten</option>
+<option value="hilden">Hilden</option>
+<option value="hildesheim">Hildesheim</option>
+<option value="huerth">H&uuml;rth</option>
+<option value="ibbenbueren">Ibbenb&uuml;ren</option>
+<option value="ingolstadt">Ingolstadt</option>
+<option value="iserlohn">Iserlohn</option>
+<option value="jena">Jena</option>
+<option value="kaiserslautern">Kaiserslautern</option>
+<option value="karlsruhe">Karlsruhe</option>
+<option value="kassel">Kassel</option>
+<option value="kempten">Kempten</option>
+<option value="kerpen">Kerpen</option>
+<option value="kiel">Kiel</option>
+<option value="kleve">Kleve</option>
+<option value="koblenz">Koblenz</option>
+<option value="koeln">K&ouml;ln</option>
+<option value="konstanz">Konstanz</option>
+<option value="krefeld">Krefeld</option>
+<option value="landshut">Landshut</option>
+<option value="langenfeld">Langenfeld</option>
+<option value="langenhagen">Langenhagen</option>
+<option value="leipzig">Leipzig</option>
+<option value="leverkusen">Leverkusen</option>
+<option value="lingen">Lingen</option>
+<option value="lippstadt">Lippstadt</option>
+<option value="loerrach">L&ouml;rrach</option>
+<option value="ludwigsburg">Ludwigsburg</option>
+<option value="ludwigshafen">Ludwigshafen</option>
+<option value="luebeck">L&uuml;beck</option>
+<option value="luedenscheid">L&uuml;denscheid</option>
+<option value="lueneburg">L&uuml;neburg</option>
+<option value="luenen">L&uuml;nen</option>
+<option value="magdeburg">Magdeburg</option>
+<option value="mainz">Mainz</option>
+<option value="mannheim">Mannheim</option>
+<option value="marburg">Marburg</option>
+<option value="marl">Marl</option>
+<option value="meerbusch">Meerbusch</option>
+<option value="menden">Menden</option>
+<option value="minden">Minden</option>
+<option value="moenchengladbach">M&ouml;nchengladbach</option>
+<option value="moers">Moers</option>
+<option value="muelheimanderruhr">M&uuml;lheim an der Ruhr</option>
+<option value="muenchen">M&uuml;nchen</option>
+<option value="muenster">M&uuml;nster</option>
+<option value="neuulm">Neuulm</option>
+<option value="neubrandenburg">Neubrandenburg</option>
+<option value="neumuenster">Neum&uuml;nster</option>
+<option value="neuss">Neuss</option>
+<option value="neustadtanderweinstrasse">Neustadt an der Weinstrasse</option>
+<option value="neuwied">Neuwied</option>
+<option value="norderstedt">Norderstedt</option>
+<option value="nordhorn">Nordhorn</option>
+<option value="nuernberg">N&uuml;rnberg</option>
+<option value="oberhausen">Oberhausen</option>
+<option value="offenbach">Offenbach</option>
+<option value="offenburg">Offenburg</option>
+<option value="oldenburg">Oldenburg</option>
+<option value="osnabrueck">Osnabr&uuml;ck</option>
+<option value="paderborn">Paderborn</option>
+<option value="passau">Passau</option>
+<option value="peine">Peine</option>
+<option value="pforzheim">Pforzheim</option>
+<option value="plauen">Plauen</option>
+<option value="potsdam">Potsdam</option>
+<option value="pulheim">Pulheim</option>
+<option value="rastatt">Rastatt</option>
+<option value="ratingen">Ratingen</option>
+<option value="ravensburg">Ravensburg</option>
+<option value="recklinghausen">Recklinghausen</option>
+<option value="regensburg">Regensburg</option>
+<option value="remscheid">Remscheid</option>
+<option value="reutlingen">Reutlingen</option>
+<option value="rheine">Rheine</option>
+<option value="rosenheim">Rosenheim</option>
+<option value="rostock">Rostock</option>
+<option value="ruesselsheim">R&uuml;sselsheim</option>
+<option value="saarbruecken">Saarbr&uuml;cken</option>
+<option value="salzgitter">Salzgitter</option>
+<option value="sanktaugustin">Sanktaugustin</option>
+<option value="schwaebisch_gmuend">Schw&auml;bisch Gm&uuml;nd</option>
+<option value="schweinfurt">Schweinfurt</option>
+<option value="schwerin">Schwerin</option>
+<option value="siegen">Siegen</option>
+<option value="sindelfingen">Sindelfingen</option>
+<option value="solingen">Solingen</option>
+<option value="speyer">Speyer</option>
+<option value="stolberg">Stolberg</option>
+<option value="stralsund">Stralsund</option>
+<option value="stuttgart">Stuttgart</option>
+<option value="trier">Trier</option>
+<option value="troisdorf">Troisdorf</option>
+<option value="tuebingen">T&uuml;bingen</option>
+<option value="ulm">Ulm</option>
+<option value="unna">Unna</option>
+<option value="velbert">Velbert</option>
+<option value="viersen">Viersen</option>
+<option value="villingenschwenningen">Villingen-Schwenningen</option>
+<option value="waiblingen">Waiblingen</option>
+<option value="weimar">Weimar</option>
+<option value="wesel">Wesel</option>
+<option value="wetzlar">Wetzlar</option>
+<option value="wiesbaden">Wiesbaden</option>
+<option value="wilhelmshaven">Wilhelmshaven</option>
+<option value="willich">Willich</option>
+<option value="wismar">Wismar</option>
+<option value="witten">Witten</option>
+<option value="wolfenbuettel">Wolfenb&uuml;ttel</option>
+<option value="wolfsburg">Wolfsburg</option>
+<option value="worms">Worms</option>
+<option value="wuerzburg">Wuerzburg</option>
+<option value="wuppertal">Wuppertal</option>
+<option value="zwickau">Zwickau</option>
+<option value="oesterreich">&Ouml;sterreich</option>
+<option value="austria">Austria</option>
+<option value="wien">Wien</option>
+<option value="graz">Graz</option>
+<option value="linz">Linz</option>
+<option value="salzburg">Salzburg</option>
+<option value="innsbruck">Innsbruck</option>
+<option value="belgium">Belgium</option>
+<option value="brussels">Brussels</option>
+<option value="bulgaria">Bulgaria</option>
+<option value="sofia">Sofia</option>
+<option value="pernik">Pernik</option>
+<option value="varna">Varna</option>
+<option value="plovdiv">Plovdiv</option>
+<option value="burgas">Burgas</option>
+<option value="velikotarnovo">Velikotarnovo</option>
+<option value="ruse">Ruse</option>
+<option value="silistra">Silistra</option>
+<option value="starazagora">Starazagora</option>
+<option value="vidin">Vidin</option>
+<option value="montana">Montana</option>
+<option value="pleven">Pleven</option>
+<option value="haskovo">Haskovo</option>
+<option value="kardzhali">Kardzhali</option>
+<option value="dimitrovgrad">Dimitrovgrad</option>
+<option value="czechrepublic">Czech Republic</option>
+<option value="prague">Prague</option>
+<option value="denmark">Denmark</option>
+<option value="finland">Finland</option>
+<option value="helsinki">Helsinki</option>
+<option value="turku">Turku</option>
+<option value="france">France</option>
+<option value="paris">Paris</option>
+<option value="alsace">Alsace</option>
+<option value="strasbourg">Strasbourg</option>
+<option value="grenoble">Grenoble</option>
+<option value="greece">Greece</option>
+<option value="athens">Athens</option>
+<option value="hungary">Hungary</option>
+<option value="budapest">Budapest</option>
+<option value="szeged">Szeged</option>
+<option value="ireland">Ireland</option>
+<option value="dublin">Dublin</option>
+<option value="italy">Italy</option>
+<option value="sicily">Sicily</option>
+<option value="florence">Florence</option>
+<option value="palermo">Palermo</option>
+<option value="bologna">Bologna</option>
+<option value="turin">Turin</option>
+<option value="netherlands">Netherlands</option>
+<option value="poland">Poland</option>
+<option value="wroclaw">Wroclaw</option>
+<option value="romania">Romania</option>
+<option value="bucharest">Bucharest</option>
+<option value="serbia">Serbia</option>
+<option value="belgrade">Belgrade</option>
+<option value="schweiz">Schweiz</option>
+<option value="suisse">Suisse</option>
+<option value="basel">Basel</option>
+<option value="bern">Bern</option>
+<option value="biel">Biel</option>
+<option value="lausanne">Lausanne</option>
+<option value="luzern">Luzern</option>
+<option value="zuerich">Z&uuml;rich</option>
+<option value="genf">Genf</option>
+<option value="winterthur">Winterthur</option>
+<option value="stgallen">Stgallen</option>
+<option value="lugano">Lugano</option>
+<option value="ukraine">Ukraine</option>
+<option value="kiev">Kiev</option>
+<option value="lviv">Lviv</option>
+<option value="unitedkingdom">United Kingdom</option>
+<option value="bristol">Bristol</option>
+<option value="london">London</option>
+<option value="chile">Chile</option>
+<option value="santiago">Santiago</option>
+<option value="dominicanrepublic">Dominicanrepublic</option>
+<option value="santodomingo">Santodomingo</option>
+<option value="puertoplata">Puerto Plata</option>
+<option value="usa">USA</option>
+<option value="portland">Portland</option>
+<option value="brunei">Brunei</option>
+<option value="nepal">Nepal</option>
+<option value="kathmandu">Kathmandu</option>
+<option value="taiwan">Taiwan</option>
+<option value="thailand">Thailand</option>
+<option value="unitedarabemirates">United Arab Emirates</option>
+<option value="uae">UAE</option>
+<option value="dubai">Dubai</option>
+<option value="vietnam">Vietnam</option>
+<option value="hanoi">Hanoi</option>
+<option value="world">World</option>
+</select>  
+    
+<div id="results"></div>
+
+<div id="graphs"></div>
+
+
+    
+</div>    
+    
+<div class ="legend" id="legendpm">
+<div id="legend-inner-pm">
+<div class="gradient">
+<div class="limit">
+</div>
+</div>
+<div class="labels">
+    <div class="label" style="bottom: 100%;"><b>500</b></div>
+    <div class="label" style="bottom: 80%;"><b>100</b></div>
+<div class="label" style="bottom: 60%;"><b>75</b></div>
+<div class="label limit" style="bottom: 40%;"><b>50</b></div>
+<div class="label" style="bottom: 20%;"><b>25</b></div>
+<div class="label" style="bottom: 0%;"><b>0 &micro;g/m&sup3;</b></div>
+</div>
+</div>
+</div>
+      
+<div class ="legend" id="legendtemp">
+<div id="legend-inner-temp">
+<div class="gradient">
+<div class="limit">
+</div>
+</div>
+<div class="labels">
+<div class="label" style="bottom: 100%;"><b>50</b></div>
+<div class="label" style="bottom: 65%;"><b>25</b></div>
+<div class="label" style="bottom: 30%;"><b>0</b></div>
+<div class="label" style="bottom: 0%;"><b>-20 &deg;</b></div>
+</div>
+</div>
+</div>
+    
+<div class ="legend" id="legendhumi">
+<div id="legend-inner-humi">
+<div class="gradient">
+<div class="limit">
+</div>
+</div>
+<div class="labels">
+    <div class="label" style="bottom: 100%;"><b>100</b></div>
+    <div class="label" style="bottom: 80%;"><b>80</b></div>
+<div class="label" style="bottom: 60%;"><b>60</b></div>
+<div class="label " style="bottom: 40%;"><b>40</b></div>
+<div class="label" style="bottom: 20%;"><b>20</b></div>
+<div class="label" style="bottom: 0%;"><b>0 &#37;</b></div>
+</div>
+</div>
+</div>
+    
+</body>
+</html>
